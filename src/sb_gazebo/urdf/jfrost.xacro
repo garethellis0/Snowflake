@@ -147,6 +147,19 @@
   </inertial>
 </link>
 
+
+<!-- Hack to get the "zed" output to the right orientation -->
+<joint name="zed_orientation" type="fixed">
+    <parent link="camera"/>
+    <child link="zed_pointcloud"/>
+    <origin xyz="0 0 0" rpy="${-(pi/2)} 0 ${-(pi/2)}"/>
+</joint>
+
+<link name="zed_pointcloud" />
+
+
+<!-- End Hack -->
+
 <!-- Lidar -->
 <joint name="lidar_joint" type="fixed">
     <parent link="chassis"/>
