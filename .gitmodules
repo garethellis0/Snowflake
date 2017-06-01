@@ -13,3 +13,6 @@
 [submodule "src/razor_imu_9dof"]
 	path = src/razor_imu_9dof
 	url = https://github.com/UBC-Snowbots/razor_imu_9dof.git
+[submodule "src/occupancy_grid_utils"]
+	path = src/occupancy_grid_utils
+	url = https://github.com/clearpathrobotics/occupancy_grid_utils
