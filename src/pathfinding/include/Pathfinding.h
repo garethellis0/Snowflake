@@ -4,44 +4,58 @@
  * Description: TODO
  */
 
-#ifndef PATHFINDING_H
-#define PATHFINDING_H
+#ifndef PATHFINDING_PATHFINDING_H
+#define PATHFINDING_PATHFINDING_H
 
 #include <iostream>
-#include <std_msgs/String.h>
 #include <ros/ros.h>
+#include <nav_msgs/OccupancyGrid.h>
+#include <tf2_ros/buffer.h>
+#include <tf2_ros/transform_listener.h>
 #include <sb_utils.h>
+#include <tf/transform_datatypes.h>
+#include <geometry_msgs/Twist.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include <occupancy_grid_utils/shortest_path.h>
+#include <occupancy_grid_utils/coordinate_conversions.h>
+#include <geometry_msgs/PointStamped.h>
+#include <boost/optional.hpp>
+#include <nav_msgs/Path.h>
 
-class MyClass {
+class Pathfinding {
 public:
-    MyClass(int argc, char **argv, std::string node_name);
-    /**
-     * Adds an exclamation point to a given string
-     *
-     * Some Longer explanation should go here
-     *
-     * @param input_string the string to add an exclamation point to
-     *
-     * @return input_string with an exclamation point added to it
-     */
-     static std::string addCharacterToString(std::string input_string, std::string suffix);
-     std::string suffix;
+    Pathfinding(int argc, char **argv, std::string node_name);
 
 private:
     /**
-     * Callback function for when a new string is received
+     * Callback function for the global map
      *
-     * @param msg the string received in the callback
+     * @param map the global map
      */
-    void subscriberCallBack(const std_msgs::String::ConstPtr& msg);
-    /**
-     * Publishes a given string
-     *
-     * @param msg_to_publish the string to publish
-     */
-    void republishMsg(std::string msg_to_publish);
+    void mapCallBack(const nav_msgs::OccupancyGrid::ConstPtr& map);
 
-    ros::Subscriber my_subscriber;
-    ros::Publisher my_publisher;
+    /**
+     * Callback function for the current destination
+     *
+     * @param dest the current destination
+     */
+    void destinationCallBack(const geometry_msgs::PointStamped::ConstPtr& dest);
+
+    ros::Subscriber map_subscriber; // Subscribes to the map topic
+    ros::Subscriber destination_subscriber; // Subscribes to the current destination
+    ros::Publisher path_publisher;
+    ros::Publisher dest_point_publisher;
+
+    std::string global_frame; // The frame of the map
+    std::string base_frame; // The frame of the robot
+
+    double inflation_radius; // The radius to inflate obstacles in the map by
+    int path_lookahead; // How many cells into the path to look for the robot's next waypoints
+
+    geometry_msgs::Point destination; // The current destination
+
+    // Used for looking up transforms
+    tf2_ros::Buffer tfBuffer;
+    tf2_ros::TransformListener* tfListener;
 };
-#endif //PATHFINDING_H
+#endif //PATHFINDING_PATHFINDING_H

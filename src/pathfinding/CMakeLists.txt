@@ -7,9 +7,10 @@ add_definitions(--std=c++14)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  roscpp
+  roscpp tf occupancy_grid_utils
 )
 find_package(occupancy_grid_utils REQUIRED)
+find_package(sb_utils REQUIRED)
 
 catkin_package(
         INCLUDE_DIRS include
@@ -23,9 +24,10 @@ catkin_package(
 ## Your package locations should be listed before other locations
 # include_directories(include)
 include_directories(
-        ./include
         ${catkin_INCLUDE_DIRS}
         ${grid_utils_INCLUDE_DIRS}
+        ${sb_utils_INCLUDE_DIRS}
+        ./include
 )
 
 ## Declare a C++ library
@@ -46,7 +48,11 @@ add_executable(pathfinding src/pathfinding.cpp src/Pathfinding.cpp)
 # target_link_libraries(pathfinding_node
 #   ${catkin_LIBRARIES}
 # )
-target_link_libraries(pathfinding ${catkin_LIBRARIES} ${grid_utils_LIBRARIES})
+target_link_libraries(pathfinding 
+    ${catkin_LIBRARIES} 
+    ${grid_utils_LIBRARIES}
+    ${sb_utils_LIBRARIES}    
+)
 
 #############
 ## Install ##
