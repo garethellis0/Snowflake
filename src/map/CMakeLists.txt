@@ -12,11 +12,14 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   tf2_ros
   pcl_ros
-  tf2_sensor_msgs
+
+  cv_bridge
+  image_transport
 )
 
 find_package(PCL REQUIRED)
 
+find_package(OpenCV REQUIRED)
 
 
 catkin_package(
@@ -30,11 +33,14 @@ include_directories(
   ./include
   ${catkin_INCLUDE_DIRS}
   ${PCL_INCLUDE_DIRS}
+  ${OpenCV_INCLUDE_DIRS}
 )
 link_directories(${PCL_LIBRARY_DIRS})
+link_directories(${OpenCV_INCLUDE_DIRS})
+
 
 add_definitions(${PCL_DEFINITIONS})
-
+add_definitions(${OpenCV_INCLUDE_DIRS})
 
 add_executable(map src/Map.cpp src/map.cpp include/Map.h)
 add_executable(map_test_pub test/test_map_publishers.cpp)
@@ -47,4 +53,7 @@ target_link_libraries(transform ${catkin_LIBRARIES})
 #test
 add_executable(test_point_pub src/test_point_publisher.cpp)
 target_link_libraries(test_point_pub ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${PCL_COMMON_LIBRARIES} ${PCL_IO_LIBRARIES})
+
+add_executable(image_to_cloud src/imageToCloud.cpp)
+target_link_libraries(image_to_cloud ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${PCL_COMMON_LIBRARIES} ${PCL_IO_LIBRARIES} ${OpenCV_LIBRARIES})
 

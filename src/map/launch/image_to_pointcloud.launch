@@ -1,0 +1,6 @@
+<launch>
+    <node pkg="map" name="image_to_cloud" type="image_to_cloud" output="screen">
+        <remap from="image" to="/vision/filtered_image" />
+        <remap from="pointcloud" to="vision" />
+    </node>
+</launch>
