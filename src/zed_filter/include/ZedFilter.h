@@ -16,6 +16,8 @@
 #include <sensor_msgs/PointCloud2.h>
 #include <sb_utils.h>
 #include <PointCloudFilter.h>
+#include <zed_filter/ZedHSVFilterConfig.h>
+#include <dynamic_reconfigure/server.h>
 
 class ZedFilter {
 
@@ -35,7 +37,15 @@ private:
     PointCloudFilter filter;
     std::string base_link_name;
 
+    dynamic_reconfigure::Server<zed_filter::ZedHSVFilterConfig> server;
+    dynamic_reconfigure::Server<zed_filter::ZedHSVFilterConfig>::CallbackType f; 
+    boost::recursive_mutex config_mutex;
+
+    PointCloudFilter::FilterValues filter_values;
+
     void imageCallBack(const sensor_msgs::PointCloud2::ConstPtr& zed_camera_output);
+
+    void dynamicReconfigureCallback(zed_filter::ZedHSVFilterConfig &config, uint32_t level);
 };
 
 

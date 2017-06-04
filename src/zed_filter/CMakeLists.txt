@@ -5,10 +5,15 @@ find_package(catkin REQUIRED COMPONENTS
     roscpp
     rospy
     pcl_ros
+    dynamic_reconfigure
 )
 
 find_package(PCL REQUIRED)
 find_package(sb_utils REQUIRED)
+
+generate_dynamic_reconfigure_options(
+    cfg/ZedHSVFilter.cfg
+)
 
 catkin_package(
 #  INCLUDE_DIRS include
@@ -44,6 +49,7 @@ target_link_libraries(zed_filter
         ${PCL_IO_LIBRARIES}
         ${sb_utils_LIBRARIES}
         )
+add_dependencies(zed_filter ${PROJECT_NAME}_gencfg)
 
 #############
 ## Testing ##

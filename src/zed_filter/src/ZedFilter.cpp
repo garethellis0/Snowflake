@@ -4,9 +4,8 @@
 
 #include <ZedFilter.h>
 
-// The constructor
-ZedFilter::ZedFilter(int argc, char **argv, std::string node_name)
-{
+// The constructor 
+ZedFilter::ZedFilter(int argc, char **argv, std::string node_name) {
     ros::init(argc, argv, node_name);
 
     // Setup NodeHandles
@@ -22,22 +21,35 @@ ZedFilter::ZedFilter(int argc, char **argv, std::string node_name)
     std::string filtered_image_topic_name = "/zed_filter/filtered_point_cloud";
     filtered_image_publisher = nh.advertise<PointCloudRGB>(filtered_image_topic_name, queue_size);
 
-    base_link_name = "base_link";
+    // Get Parameters
+    SB_getParam(private_nh, "base_frame", base_link_name, std::string("base_link"));
 
-    PointCloudFilter::FilterValues filter_values;
-    // Obtain filter value parameters
-    SB_getParam(private_nh, "h_min", filter_values.h_min, (float) 1.0);
-    SB_getParam(private_nh, "h_max", filter_values.h_max, (float) 360.0);
-    SB_getParam(private_nh, "s_min", filter_values.s_min, (float) 0);
-    SB_getParam(private_nh, "s_max", filter_values.s_max, (float) 1);
-    SB_getParam(private_nh, "v_min", filter_values.v_min, (float) 0);
-    SB_getParam(private_nh, "v_max", filter_values.v_max, (float) 1);
+    // Start dynamic reconfigure stuff
+    boost::recursive_mutex::scoped_lock dyn_reconf_lock(config_mutex);
+    dyn_reconf_lock.unlock();
+    f = boost::bind(&ZedFilter::dynamicReconfigureCallback, this, _1, _2);
+    server.setCallback(f);
 
-    filter = PointCloudFilter(filter_values);
+    // Obtain default filter value parameters
+    zed_filter::ZedHSVFilterConfig config;
+    server.getConfigDefault(config);
+    server.updateConfig(config);
 
 }
 
+void ZedFilter::dynamicReconfigureCallback(zed_filter::ZedHSVFilterConfig &config, uint32_t level){
+    filter_values.h_min = config.h_min;   
+    filter_values.h_max = config.h_max;   
+    filter_values.s_min = config.s_min;   
+    filter_values.s_max = config.s_max;   
+    filter_values.v_min = config.v_min;   
+    filter_values.v_max = config.v_max;   
+}
+
 void ZedFilter::imageCallBack(const sensor_msgs::PointCloud2::ConstPtr& zed_camera_output) {
+
+    filter = PointCloudFilter(filter_values);
+
     sensor_msgs::PointCloud2 transformed_input;
     SB_doTransform(*zed_camera_output, transformed_input, base_link_name);
 
