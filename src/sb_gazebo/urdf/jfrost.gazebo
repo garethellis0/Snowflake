@@ -92,6 +92,7 @@
         <focalLength>0</focalLength>
         <hackBaseline>0</hackBaseline>
       </plugin>
+      </sensor>
     </gazebo>
 
     <!-- IMU -->
