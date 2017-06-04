@@ -23,6 +23,7 @@ sudo apt-get install -y\
     ros-kinetic-effort-controllers \
     ros-kinetic-hector-gazebo \
     ros-kinetic-turtlebot-teleop \
+    ros-kinetic-tf2-bullet \
     python-rosinstall \
     python-visual \
     python-wxtools \
