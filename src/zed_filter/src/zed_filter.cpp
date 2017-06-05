@@ -10,8 +10,9 @@
 
 int main(int argc, char **argv){
     // Setup your ROS node
-    std::string node_name = "my_node";
+    std::string node_name = "zed_filter";
 
+    ros::init(argc, argv, node_name);
     // Create an instance of your class
     ZedFilter zed_filter(argc, argv, node_name);
 

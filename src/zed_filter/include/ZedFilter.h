@@ -36,6 +36,7 @@ private:
     ros::Publisher filtered_image_publisher;
     PointCloudFilter filter;
     std::string base_link_name;
+    std::string config_file_path;
 
     dynamic_reconfigure::Server<zed_filter::ZedHSVFilterConfig> server;
     dynamic_reconfigure::Server<zed_filter::ZedHSVFilterConfig>::CallbackType f; 

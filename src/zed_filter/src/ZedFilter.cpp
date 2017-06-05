@@ -3,17 +3,17 @@
 //
 
 #include <ZedFilter.h>
+#include <fstream>
+#include <ros/package.h>
 
 // The constructor 
 ZedFilter::ZedFilter(int argc, char **argv, std::string node_name) {
-    ros::init(argc, argv, node_name);
-
     // Setup NodeHandles
     ros::NodeHandle nh;
     ros::NodeHandle private_nh("~");
 
     // Setup Subscriber(s)
-    std::string camera_image_topic_name = "/zed/point_cloud/cloud_registered";
+    std::string camera_image_topic_name = "/zed/camera/point_cloud/cloud_corrected";
     int queue_size = 1;
     raw_image_subscriber = nh.subscribe(camera_image_topic_name, queue_size, &ZedFilter::imageCallBack, this);
     
@@ -34,10 +34,10 @@ ZedFilter::ZedFilter(int argc, char **argv, std::string node_name) {
     zed_filter::ZedHSVFilterConfig config;
     server.getConfigDefault(config);
     server.updateConfig(config);
-
 }
 
 void ZedFilter::dynamicReconfigureCallback(zed_filter::ZedHSVFilterConfig &config, uint32_t level){
+    ROS_INFO_STREAM("Reconfigure called");
     filter_values.h_min = config.h_min;   
     filter_values.h_max = config.h_max;   
     filter_values.s_min = config.s_min;   
