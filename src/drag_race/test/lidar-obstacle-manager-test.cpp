@@ -287,8 +287,9 @@ TEST_F(LidarObstacleManagerTest, getConeRVizMarkerTest) {
 
     visualization_msgs::Marker obstacle_markers = obstacle_manager_1.getConesRVizMarkers();
 
-    // Check that we have the expected number of markers
     EXPECT_EQ(4, obstacle_markers.points.size());
+    EXPECT_EQ((int)visualization_msgs::Marker_::POINTS, obstacle_markers.type);
+    EXPECT_EQ((int)visualization_msgs::Marker::ADD, obstacle_markers.action);
 
     // Check that the position of the markers matches that of the obstacles
     std::vector<Point> expected_marker_points;
@@ -307,7 +308,12 @@ TEST_F(LidarObstacleManagerTest, getConeRVizMarkerTest) {
 }
 
 TEST_F(LidarObstacleManagerTest, getConeLinesRVizMarkerTest) {
-    // TODO: You are here
+    obstacle_manager_1.addObstacle(cone1);
+    obstacle_manager_1.addObstacle(cone4);
+
+    visualization_msgs::Marker line_markers = obstacle_manager_1.getConeLinesRVizMarker();
+
+
 }
 
 TEST_F(LidarObstacleManagerTest, getBestConeLinesRVizMarkerTest) {
