@@ -34,6 +34,8 @@ bool front_collision_only)
     // Set default values for the rviz visualisation stuff
     setConeRVizMarkerColor(0, 1, 0, 1);
     setConeRVizMarkerSize(0.1);
+    setLineRVizMarkerColor(0, 0, 1, 1);
+    setLineRVizMarkerSize(0.1);
 }
 
 void LidarObstacleManager::addLaserScan(const sensor_msgs::LaserScan& scan) {
@@ -107,8 +109,8 @@ void LidarObstacleManager::addObstacle(LidarObstacle obstacle) {
 double
 LidarObstacleManager::minDistanceBetweenObstacles(LidarObstacle obstacle1,
                                                   LidarObstacle obstacle2) {
-    // Note: we're doing n^2 operations on two potentially very large objects
-    // here, so it may be a good place to start if performance issues are encountered
+    // Note: we're doing n^2 operations on two potentially very large objects here,
+    // so it may be a good place to start if performance issues are encountered
 
     std::vector<Point> obstacle1_points = obstacle1.getReadingsAsPoints();
     std::vector<Point> obstacle2_points = obstacle2.getReadingsAsPoints();
@@ -285,10 +287,22 @@ void LidarObstacleManager::setConeRVizMarkerSize(float size) {
     rviz_cone_marker_scale.y = size;
 }
 
-visualization_msgs::Marker LidarObstacleManager::getConeRVizMarker() {
+void LidarObstacleManager::setLineRVizMarkerColor(float red, float green, float blue, float alpha) {
+    rviz_line_marker_color.r = red;
+    rviz_line_marker_color.g = green;
+    rviz_line_marker_color.b = blue;
+    rviz_line_marker_color.a = alpha;
+}
+
+void LidarObstacleManager::setLineRVizMarkerSize(float size) {
+    rviz_line_marker_scale.x = size;
+    rviz_line_marker_scale.y = size;
+}
+
+visualization_msgs::Marker LidarObstacleManager::getConesRVizMarkers() {
     visualization_msgs::Marker points;
 
-    points.header.frame_id    = rviz_marker_frame_of_reference;
+    points.header.frame_id    = rviz_marker_frame_id;
     points.header.stamp       = ros::Time::now();
     points.ns                 = "debug";
     points.action             = visualization_msgs::Marker::ADD;
@@ -315,7 +329,7 @@ visualization_msgs::Marker LidarObstacleManager::getConeLinesRVizMarker() {
     visualization_msgs::Marker lines;
 
     // TODO: Should be a param (currently in the default LaserScan frame)
-    lines.header.frame_id    = rviz_marker_frame_of_reference;
+    lines.header.frame_id    = rviz_marker_frame_id;
     lines.header.stamp       = ros::Time::now();
     lines.ns                 = rviz_marker_namespace;
     lines.action             = visualization_msgs::Marker::ADD;
@@ -327,15 +341,14 @@ visualization_msgs::Marker LidarObstacleManager::getConeLinesRVizMarker() {
     lines.color = rviz_cone_marker_color;
 
     // Get the cone lines
-    std::vector<LineOfBestFit> cone_lines = getConeLines();
-    for (int i = 0; i < cone_lines.size(); i++) {
+    for (auto &cone_line : getConeLines()) {
         // Get two points to represent the line
         geometry_msgs::Point p1, p2;
         p1.x = -10;
-        p1.y = cone_lines[i].getYCoorAtX(p1.x);
+        p1.y = cone_line.getYCoorAtX(p1.x);
         // TODO: make length here a param
         p2.x = 10;
-        p2.y = cone_lines[i].getYCoorAtX(p2.x);
+        p2.y = cone_line.getYCoorAtX(p2.x);
         lines.points.push_back(p1);
         lines.points.push_back(p2);
     }
@@ -349,20 +362,16 @@ LidarObstacleManager::getBestConeLineRVizMarker(bool line_to_the_right) {
     visualization_msgs::Marker line;
 
     // TODO: Should be a param (currently in the default LaserScan frame)
-    line.header.frame_id    = "laser";
+    line.header.frame_id    = rviz_marker_frame_id;
     line.header.stamp       = ros::Time::now();
-    line.ns                 = "debug";
+    line.ns                 = rviz_marker_namespace;
     line.action             = visualization_msgs::Marker::ADD;
     line.pose.orientation.w = 1.0;
     line.id                 = 0;
     line.type               = visualization_msgs::Marker::LINE_LIST;
     line.action             = visualization_msgs::Marker::ADD;
-    // TODO: Make the scale a param
-    line.scale.x = 0.1;
-    line.scale.y = 0.1;
-    // TODO: Make this a param
-    line.color.b = 1.0f;
-    line.color.a = 1.0;
+    line.scale = rviz_line_marker_scale;
+    line.color = rviz_line_marker_color;
 
     // TODO: Find a better way to sync this logic up. Copy pasting sucks
     LineOfBestFit best_line = getBestLine(line_to_the_right);
@@ -379,6 +388,41 @@ LidarObstacleManager::getBestConeLineRVizMarker(bool line_to_the_right) {
     return line;
 }
 
+// TODO: Make proper use of me!
+visualization_msgs::Marker LidarObstacleManager::getMarkersForLines(std::vector<LineOfBestFit> lines,
+                                                                    visualization_msgs::Marker::_color_type color,
+                                                                    visualization_msgs::Marker::_scale_type scale) {
+    visualization_msgs::Marker marker_lines;
+
+    // TODO: Should be a param (currently in the default LaserScan frame)
+    marker_lines.header.frame_id    = rviz_marker_frame_id;
+    marker_lines.header.stamp       = ros::Time::now();
+    marker_lines.ns                 = rviz_marker_namespace;
+    marker_lines.action             = visualization_msgs::Marker::ADD;
+    marker_lines.pose.orientation.w = 1.0;
+    marker_lines.id                 = 0;
+    marker_lines.type               = visualization_msgs::Marker::LINE_LIST;
+    marker_lines.action             = visualization_msgs::Marker::ADD;
+    marker_lines.scale = rviz_cone_marker_scale;
+    marker_lines.color = rviz_cone_marker_color;
+
+    // Get the cone marker_lines
+    for (auto &cone_line : lines) {
+        // Get two points to represent the line
+        geometry_msgs::Point p1, p2;
+        p1.x = -10;
+        p1.y = cone_line.getYCoorAtX(p1.x);
+        // TODO: make length here a param
+        p2.x = 10;
+        p2.y = cone_line.getYCoorAtX(p2.x);
+        marker_lines.points.push_back(p1);
+        marker_lines.points.push_back(p2);
+    }
+    return marker_lines;
+}
+
 bool LidarObstacleManager::collisionDetected() {
     return collision_detected;
 }
+
+

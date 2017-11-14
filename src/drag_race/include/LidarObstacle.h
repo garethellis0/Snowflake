@@ -30,6 +30,7 @@ struct Point {
 };
 double distanceBetweenPoints(const Point& p1, const Point& p2);
 bool operator==(const Point& p1, const Point& p2);
+bool operator<(const Point& p1, const Point& p2);
 
 class LidarObstacle {
   public:

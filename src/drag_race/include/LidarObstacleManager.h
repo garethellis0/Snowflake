@@ -170,6 +170,25 @@ class LidarObstacleManager {
     void setConeRVizMarkerSize(float size);
 
     /**
+     * Sets the color for RViz markers generated from the lines
+     *
+     * Value obove 1 will be treated as 1, values below 0 will be treated as 0
+     *
+     * @param red (0-1) the Red component of the color
+     * @param green (0-1) the Green component of the color
+     * @param blue (0-1) the Blue component of the color
+     * @param alpha (0-1) the alpha band (transparency) of the color
+     */
+    void setLineRVizMarkerColor(float red, float green, float blue, float alpha);
+
+    /**
+     * Sets the size of the RViz markers generated from from the lines
+     *
+     * @param size the desired size of the markers
+     */
+    void setLineRVizMarkerSize(float size);
+
+    /**
      * Gets all stored obstacles as a marker of points that can be rendered in
      * RViz
      *
@@ -180,7 +199,7 @@ class LidarObstacleManager {
     // this as well
     // TODO: to represent things like radius
     // TODO: TEST ME
-    visualization_msgs::Marker getConeRVizMarker();
+    visualization_msgs::Marker getConesRVizMarkers();
 
     /**
      * Gets the lines determined from cones as a marker of lines that can be
@@ -209,6 +228,11 @@ class LidarObstacleManager {
     bool collisionDetected();
 
   private:
+
+    visualization_msgs::Marker getMarkersForLines(std::vector<LineOfBestFit> lines,
+                                                      visualization_msgs::Marker::_color_type color,
+                                                      visualization_msgs::Marker::_scale_type scale);
+
     // **** END ZONE COLLISION DETECTION ****
     // TODO: Move this to its own node later.
 
@@ -264,8 +288,14 @@ class LidarObstacleManager {
     // The size of the rviz markers we'll generate for each cone
     visualization_msgs::Marker::_scale_type rviz_cone_marker_scale;
 
+    // The color of the rviz markers we'll generate for each line
+    visualization_msgs::Marker::_color_type rviz_line_marker_color;
+
+    // The size of the rviz markers we'll generate for each line
+    visualization_msgs::Marker::_scale_type rviz_line_marker_scale;
+
     // The frame of reference for the rviz markers
-    std::string rviz_marker_frame_of_reference = "laser";
+    std::string rviz_marker_frame_id = "laser";
 
     // The namespace to publish the rviz markers under
     std::string rviz_marker_namespace = "debug";

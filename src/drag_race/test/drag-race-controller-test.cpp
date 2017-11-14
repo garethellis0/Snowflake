@@ -1,13 +1,14 @@
-#include <DragRaceNode.h>
-#include <LidarObstacleManager.h>
-#include <geometry_msgs/Twist.h>
-#include <gtest/gtest.h>
-
 /*
  * Created By: Robyn Castro
  * Created On: July 8, 2017
  * Description: Tests for Drag Race Controller
  */
+
+#include <DragRaceNode.h>
+#include <LidarObstacleManager.h>
+#include <geometry_msgs/Twist.h>
+#include <gtest/gtest.h>
+
 
 double more_than_target_distance = 0.0;
 double less_than_target_distance = 0.65;

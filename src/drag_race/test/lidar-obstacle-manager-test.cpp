@@ -1,7 +1,7 @@
 /*
  * Created By: Gareth Ellis
  * Created On: July 4, 2017
- * Description: TODO
+ * Description: Tests for the LidarObstacleManager class
  */
 
 #include <LidarObstacleManager.h>
@@ -18,6 +18,9 @@ class LidarObstacleManagerTest : public testing::Test {
             ) {}
 
     virtual void SetUp() {
+        // Start ROS time so that we can timestamp visualisation stuff
+        ros::Time::init();
+
         // Setup our cones
         double angle_increment = M_PI / 300;
         cone1                  = LidarObstacle({
@@ -61,6 +64,7 @@ class LidarObstacleManagerTest : public testing::Test {
         scan1.angle_increment = (scan1.angle_max - scan1.angle_min) / num_rays;
         // Set all the ranges to 0 initially
         scan1.ranges    = std::vector<float>(num_rays, 0);
+        // Range min and range max were taken from a `Hokuyo URG-04LX-UG01`
         scan1.range_min = 0.02;
         scan1.range_max = 5.6;
         // Add the obstacles
@@ -233,7 +237,6 @@ TEST_F(LidarObstacleManagerTest, noObstacleInFront) {
     // EXPECT_FALSE(man.collisionDetected());
 }
 
-// TODO: Test
 TEST_F(LidarObstacleManagerTest, obstacleInFront) {
     sensor_msgs::LaserScan end_zone_scan;
 
@@ -272,6 +275,43 @@ TEST_F(LidarObstacleManagerTest, obstacleInFront) {
     // 0.5);
     // man.addLaserScan(scan1);
     // EXPECT_TRUE(man.collisionDetected());
+}
+
+TEST_F(LidarObstacleManagerTest, getConeRVizMarkerTest) {
+    // Add some obstacles
+    obstacle_manager_1.addObstacle(cone1);
+    obstacle_manager_1.addObstacle(cone2);
+    obstacle_manager_1.addObstacle(cone3);
+    obstacle_manager_1.addObstacle(cone4);
+    std::vector<LidarObstacle> obstacles = obstacle_manager_1.getObstacles();
+
+    visualization_msgs::Marker obstacle_markers = obstacle_manager_1.getConesRVizMarkers();
+
+    // Check that we have the expected number of markers
+    EXPECT_EQ(4, obstacle_markers.points.size());
+
+    // Check that the position of the markers matches that of the obstacles
+    std::vector<Point> expected_marker_points;
+    for (auto& obstacle : obstacles){
+        expected_marker_points.emplace_back(obstacle.getCenter());
+    }
+    std::vector<Point> actual_marker_points;
+    for (auto& point: obstacle_markers.points) {
+        actual_marker_points.emplace_back(Point{point.x, point.y});
+    }
+    // We don't care about the order
+    std::sort(expected_marker_points.begin(), expected_marker_points.end());
+    std::sort(actual_marker_points.begin(), actual_marker_points.end());
+
+    EXPECT_EQ(expected_marker_points, actual_marker_points);
+}
+
+TEST_F(LidarObstacleManagerTest, getConeLinesRVizMarkerTest) {
+    // TODO: You are here
+}
+
+TEST_F(LidarObstacleManagerTest, getBestConeLinesRVizMarkerTest) {
+    // TODO: You are here
 }
 
 int main(int argc, char** argv) {

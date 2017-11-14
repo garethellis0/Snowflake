@@ -169,7 +169,7 @@ void DragRaceNode::scanCallBack(const sensor_msgs::LaserScan::ConstPtr& scan) {
 
     if (debug) {
         // Broadcast a representation of the obstacles that RViz can visualize
-        cone_debug_publisher.publish(obstacle_manager.getConeRVizMarker());
+        cone_debug_publisher.publish(obstacle_manager.getConesRVizMarkers());
         cone_line_debug_publisher.publish(
                 obstacle_manager.getConeLinesRVizMarker());
         best_line_debug_publisher.publish(
