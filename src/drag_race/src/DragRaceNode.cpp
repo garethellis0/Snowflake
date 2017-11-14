@@ -22,7 +22,6 @@ DragRaceNode::DragRaceNode(int argc, char** argv, std::string node_name)
     scan_subscriber =
     nh.subscribe(scan_topic, queue_size, &DragRaceNode::scanCallBack, this);
 
-    // TODO: make sure this is the right topic name
     std::string traffic_light_topic = "/robot/vision/activity_detected";
 
     traffic_light_subscriber = nh.subscribe(
@@ -78,7 +77,6 @@ DragRaceNode::DragRaceNode(int argc, char** argv, std::string node_name)
     private_nh, "obstacle_ticks_threshold", obstacle_ticks_threshold, 10);
     SB_getParam(private_nh, "collision_distance", collision_distance, 3.0);
 
-    // NOW IN RADIANS
     SB_getParam(private_nh, "front_angle", front_angle, M_PI_2);
     SB_getParam(
     private_nh, "front_collision_only", front_collision_only, false);
@@ -87,6 +85,7 @@ DragRaceNode::DragRaceNode(int argc, char** argv, std::string node_name)
     private_nh, "side_angle_min", side_angle_min, M_PI_2 - M_PI_4 / 2);
     SB_getParam(
     private_nh, "region_fill_percentage", region_fill_percentage, 0.5);
+    SB_getParam(private_nh, "debug", debug, false);
 
     // Setup drag race controller with given params
     drag_race_controller = DragRaceController(target_distance,
@@ -127,16 +126,11 @@ void DragRaceNode::scanCallBack(const sensor_msgs::LaserScan::ConstPtr& scan) {
 
     bool no_line_on_expected_side = false;
 
-    // TODO: Option 1
     if (obstacle_manager.collisionDetected()) {
         incoming_obstacle_ticks++;
     } else {
         // False alarm
         incoming_obstacle_ticks = 0;
-
-        // This is maybe better? Experiment
-        // incoming_obstacle_ticks--;
-        // if (incoming_obstacle_ticks < 0) incoming_obstacle_ticks = 0;
     }
 
     if (incoming_obstacle_ticks > obstacle_ticks_threshold) {
@@ -159,7 +153,7 @@ void DragRaceNode::scanCallBack(const sensor_msgs::LaserScan::ConstPtr& scan) {
     geometry_msgs::Twist twist = drag_race_controller.determineDesiredMotion(
     best_line, no_line_on_expected_side);
 
-    // If no green light has been detected stop.
+    // If no green light has been detected, don't move
     if (green_count_recognised < minimum_green_recognised_count) {
         twist.angular.z = 0;
         twist.linear.x  = 0;
@@ -173,11 +167,12 @@ void DragRaceNode::scanCallBack(const sensor_msgs::LaserScan::ConstPtr& scan) {
     // Publish our desired twist message
     twist_publisher.publish(twist);
 
-    // TODO: have a debug param for this
-    // Broadcast a visualisable representation so we can see obstacles in RViz
-    cone_debug_publisher.publish(obstacle_manager.getConeRVizMarker());
-    cone_line_debug_publisher.publish(
-    obstacle_manager.getConeLinesRVizMarker());
-    best_line_debug_publisher.publish(
-    obstacle_manager.getBestConeLineRVizMarker(line_to_the_right));
+    if (debug) {
+        // Broadcast a representation of the obstacles that RViz can visualize
+        cone_debug_publisher.publish(obstacle_manager.getConeRVizMarker());
+        cone_line_debug_publisher.publish(
+                obstacle_manager.getConeLinesRVizMarker());
+        best_line_debug_publisher.publish(
+                obstacle_manager.getBestConeLineRVizMarker(line_to_the_right));
+    }
 }

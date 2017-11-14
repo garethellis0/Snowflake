@@ -1,24 +1,20 @@
 /*
  * Created By: Gareth Ellis
  * Created On: July 4, 2017
- * Description: TODO
+ * Description:
  */
 
 #include <LidarObstacleManager.h>
 #include <cmath>
 #include <stack>
 
-// TODO: We should probably get rid of the default constructor here.....
-LidarObstacleManager::LidarObstacleManager()
-  : max_obstacle_merging_distance(0.3), cone_grouping_tolerance(1.3){};
-
+// TODO: We should not be doing ANYTHING with collisions
 LidarObstacleManager::LidarObstacleManager(
 double max_obstacle_merging_distance,
 double max_distance_from_robot_accepted,
 double cone_grouping_tolerance,
 double min_wall_length,
 double collision_distance,
-
 double front_angle,
 double side_angle_max,
 double side_angle_min,
@@ -33,7 +29,12 @@ bool front_collision_only)
     side_angle_max(side_angle_max),
     side_angle_min(side_angle_min),
     region_fill_percentage(region_fill_percentage),
-    front_collision_only(front_collision_only) {}
+    front_collision_only(front_collision_only) {
+
+    // Set default values for the rviz visualisation stuff
+    setConeRVizMarkerColor(0, 1, 0, 1);
+    setConeRVizMarkerSize(0.1);
+}
 
 void LidarObstacleManager::addLaserScan(const sensor_msgs::LaserScan& scan) {
     // Number of hits for each region
@@ -106,12 +107,8 @@ void LidarObstacleManager::addObstacle(LidarObstacle obstacle) {
 double
 LidarObstacleManager::minDistanceBetweenObstacles(LidarObstacle obstacle1,
                                                   LidarObstacle obstacle2) {
-    // TODO: This is ABSURDLY ineffecient. We're doing n^2 operations on 2
-    // potentially
-    // TODO: very large objects. We should be able to do some sort of obstacle
-    // approx to
-    // TODO: circles or boxes and compare them that way (need to update
-    // LidarObstacle for that approx)
+    // Note: we're doing n^2 operations on two potentially very large objects
+    // here, so it may be a good place to start if performance issues are encountered
 
     std::vector<Point> obstacle1_points = obstacle1.getReadingsAsPoints();
     std::vector<Point> obstacle2_points = obstacle2.getReadingsAsPoints();
@@ -276,27 +273,30 @@ LineOfBestFit LidarObstacleManager::getBestLine(bool lineToTheRight) {
     return bestLine;
 }
 
+void LidarObstacleManager::setConeRVizMarkerColor(float red, float green, float blue, float alpha) {
+    rviz_cone_marker_color.r = red;
+    rviz_cone_marker_color.g = red;
+    rviz_cone_marker_color.b = blue;
+    rviz_cone_marker_color.a = alpha;
+}
+
+void LidarObstacleManager::setConeRVizMarkerSize(float size) {
+    rviz_cone_marker_scale.x = size;
+    rviz_cone_marker_scale.y = size;
+}
+
 visualization_msgs::Marker LidarObstacleManager::getConeRVizMarker() {
     visualization_msgs::Marker points;
 
-    // TODO: we shold differenetiat between walls and cones
-
-    // TODO: Should be a param (currently in the default LaserScan frame)
-    points.header.frame_id    = "laser";
+    points.header.frame_id    = rviz_marker_frame_of_reference;
     points.header.stamp       = ros::Time::now();
     points.ns                 = "debug";
     points.action             = visualization_msgs::Marker::ADD;
     points.pose.orientation.w = 1.0;
     points.id                 = 0;
-    // TODO: Make these round, not blocks
     points.type = visualization_msgs::Marker::POINTS;
-    // TODO: Make the scale a param
-    points.scale.x = 0.1;
-    points.scale.y = 0.1;
-    // Points are green
-    // TODO: Make this a param
-    points.color.g = 1.0f;
-    points.color.a = 1.0;
+    points.scale = rviz_cone_marker_scale;
+    points.color = rviz_cone_marker_color;
 
     for (LidarObstacle obstacle : obstacles) {
         if (obstacle.getObstacleType() == CONE) {
@@ -315,20 +315,16 @@ visualization_msgs::Marker LidarObstacleManager::getConeLinesRVizMarker() {
     visualization_msgs::Marker lines;
 
     // TODO: Should be a param (currently in the default LaserScan frame)
-    lines.header.frame_id    = "laser";
+    lines.header.frame_id    = rviz_marker_frame_of_reference;
     lines.header.stamp       = ros::Time::now();
-    lines.ns                 = "debug";
+    lines.ns                 = rviz_marker_namespace;
     lines.action             = visualization_msgs::Marker::ADD;
     lines.pose.orientation.w = 1.0;
     lines.id                 = 0;
     lines.type               = visualization_msgs::Marker::LINE_LIST;
     lines.action             = visualization_msgs::Marker::ADD;
-    // TODO: Make the scale a param
-    lines.scale.x = 0.1;
-    lines.scale.y = 0.1;
-    // TODO: Make this a param
-    lines.color.r = 1.0f;
-    lines.color.a = 1.0;
+    lines.scale = rviz_cone_marker_scale;
+    lines.color = rviz_cone_marker_color;
 
     // Get the cone lines
     std::vector<LineOfBestFit> cone_lines = getConeLines();

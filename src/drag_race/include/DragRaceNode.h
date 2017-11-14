@@ -14,7 +14,6 @@
 #include <vector>
 
 // ROS Includes
-// TODO: Sort me for neatness
 #include <geometry_msgs/Twist.h>
 #include <ros/ros.h>
 #include <sensor_msgs/LaserScan.h>
@@ -32,8 +31,21 @@ class DragRaceNode {
 
   private:
     // TODO: Doc comment
+    /**
+     * Computes a new twist message and publishes it, based on a given Lidar scan
+     *
+     * Computed twist message aims to keep us moving straight, relative to
+     * a found line of cones in the Lidar scan
+     *
+     * @param scan
+     */
     void scanCallBack(const sensor_msgs::LaserScan::ConstPtr& scan);
 
+    /**
+     * This increments `green_count_recognised` if `green_light_detected` is true
+     *
+     * @param green_light_detected
+     */
     void greenLightCallBack(const std_msgs::Bool& green_light_detected);
 
     // Manages obstacles, including the cones and wall
@@ -59,6 +71,9 @@ class DragRaceNode {
     double theta_scaling_multiplier;
     double angular_speed_multiplier;
     double linear_speed_multiplier;
+
+    // Whether or not we want to publish debug info (for example, visualisations)
+    bool debug;
 
     // Traffic light detection
     int minimum_green_recognised_count;

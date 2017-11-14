@@ -54,6 +54,9 @@
             <rosparam param="theta_scaling_multiplier"> 1.75 </rosparam>
             <rosparam param="angular_vel_cap"> 0.75 </rosparam>
             <rosparam param="linear_vel_cap"> 1 </rosparam>
+
+        <!-- Debug Params -->
+            <rosparam param="debug"> True </rosparam>
             
     </node>
 

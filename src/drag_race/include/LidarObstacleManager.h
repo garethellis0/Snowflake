@@ -151,6 +151,25 @@ class LidarObstacleManager {
                                               LidarObstacle obstacle2);
 
     /**
+     * Sets the color for RViz markers generated from the cones
+     *
+     * Value obove 1 will be treated as 1, values below 0 will be treated as 0
+     *
+     * @param red (0-1) the Red component of the color
+     * @param green (0-1) the Green component of the color
+     * @param blue (0-1) the Blue component of the color
+     * @param alpha (0-1) the alpha band (transparency) of the color
+     */
+    void setConeRVizMarkerColor(float red, float green, float blue, float alpha);
+
+    /**
+     * Sets the size of the RViz markers generated from from the cones
+     *
+     * @param size the desired size of the markers
+     */
+    void setConeRVizMarkerSize(float size);
+
+    /**
      * Gets all stored obstacles as a marker of points that can be rendered in
      * RViz
      *
@@ -236,6 +255,20 @@ class LidarObstacleManager {
 
     // True if there is an obstacle within collision_distance away
     bool collision_detected;
+
+    // *** VISUALISATION PARAMETERS ***
+
+    // The color of the rviz markers we'll generate for each cone
+    visualization_msgs::Marker::_color_type rviz_cone_marker_color;
+
+    // The size of the rviz markers we'll generate for each cone
+    visualization_msgs::Marker::_scale_type rviz_cone_marker_scale;
+
+    // The frame of reference for the rviz markers
+    std::string rviz_marker_frame_of_reference = "laser";
+
+    // The namespace to publish the rviz markers under
+    std::string rviz_marker_namespace = "debug";
 };
 
 #endif // DRAG_RACE_LIDAROBSTACLEMANAGER_H

@@ -9,7 +9,13 @@
 
 class LidarObstacleManagerTest : public testing::Test {
   protected:
-    LidarObstacleManagerTest() : obstacle_manager_1() {}
+    LidarObstacleManagerTest() :
+            obstacle_manager_1(
+                0.3,
+                0,
+                1.3,
+                0, 0, 0, 0, 0, 0, false
+            ) {}
 
     virtual void SetUp() {
         // Setup our cones
