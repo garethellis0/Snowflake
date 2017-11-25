@@ -312,8 +312,6 @@ TEST_F(LidarObstacleManagerTest, getConeLinesRVizMarkerTest) {
     obstacle_manager_1.addObstacle(cone4);
 
     visualization_msgs::Marker line_markers = obstacle_manager_1.getConeLinesRVizMarker();
-
-
 }
 
 TEST_F(LidarObstacleManagerTest, getBestConeLinesRVizMarkerTest) {

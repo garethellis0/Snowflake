@@ -39,6 +39,7 @@ include_directories(
 # TODO: Perhaps rename to something like `drag_race_controller_node`
 add_executable(drag_race_node
         include/LidarObstacleManager.h
+        include/LidarObstacle.h
         src/drag_race_node.cpp
         src/DragRaceNode.cpp
         src/DragRaceController.cpp
