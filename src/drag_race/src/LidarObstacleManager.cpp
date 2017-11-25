@@ -68,6 +68,7 @@ void LidarObstacleManager::addLaserScan(const sensor_msgs::LaserScan& scan) {
         }
     }
 
+    // TODO: We should not be doing *anything* here to do with collisions
     int side_region_total_size =
     (side_angle_max - side_angle_min) / scan.angle_increment;
 
@@ -197,7 +198,6 @@ LidarObstacleManager::getLineOfBestFit(const std::vector<Point>& points) {
     // Get line of best fit using linear regression formula
     // http://www.statisticshowto.com/how-to-find-a-linear-regression-equation/
 
-    // TODO: Handle this more nicely
     // WE SHOULD NEVER GET HERE
     BOOST_ASSERT(points.size() >= 2);
 
@@ -258,17 +258,17 @@ LineOfBestFit LidarObstacleManager::getBestLine(bool lineToTheRight) {
 
     std::vector<LineOfBestFit> lines = getConeLines();
 
-    for (size_t i = 0; i < lines.size(); i++) {
+    for (auto &line : lines) {
         // Only check lines where the y-intercept is on the correct side.
-        if ((lineToTheRight && lines[i].getYIntercept() < 0) ||
-            (!lineToTheRight && lines[i].getYIntercept() >= 0)) {
+        if ((lineToTheRight && line.getYIntercept() < 0) ||
+            (!lineToTheRight && line.getYIntercept() >= 0)) {
             // Don't accept lines that are too far from the robot.
-            if (fabs(lines[i].getYIntercept()) <=
+            if (fabs(line.getYIntercept()) <=
                 max_distance_from_robot_accepted) {
                 // If correlation is stronger than the current best, update best
                 // line.
-                if (fabs(lines[i].correlation) > fabs(bestLine.correlation))
-                    bestLine = lines[i];
+                if (fabs(line.correlation) > fabs(bestLine.correlation))
+                    bestLine = line;
             }
         }
     }
@@ -298,6 +298,8 @@ void LidarObstacleManager::setLineRVizMarkerSize(float size) {
     rviz_line_marker_scale.x = size;
     rviz_line_marker_scale.y = size;
 }
+
+// TODO: Most of this visualisation stuff can come from Robyn's new `RVizUtil` class
 
 visualization_msgs::Marker LidarObstacleManager::getConesRVizMarkers() {
     visualization_msgs::Marker points;

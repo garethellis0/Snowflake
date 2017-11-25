@@ -7,9 +7,6 @@
 
 #include <LidarObstacle.h>
 
-// TODO: min wall length, and determination of whether to merge obstacles and
-// what their type is,
-// TODO: all really belongs in LidarObstacleManager
 LidarObstacle::LidarObstacle() : LidarObstacle(std::vector<Reading>()) {}
 
 LidarObstacle::LidarObstacle(double min_wall_length)
@@ -131,7 +128,6 @@ void LidarObstacle::updateCenter() {
 }
 
 void LidarObstacle::determineObstacleType() {
-    // TODO: Setup some sort of min number of readings to be considered a cone
     // If this obstacle has no readings, then it's NONE
     if (readings.size() == 0) obstacle_type = NONE;
     // If the obstacle is long enough, then it's a WALL
@@ -140,8 +136,6 @@ void LidarObstacle::determineObstacleType() {
     else // If it's not NONE or a WALL, then it's a CONE
         obstacle_type = CONE;
 }
-
-// TODO: Is there a more appropriate place for these functions?
 
 double LidarObstacle::getLength() {
     // Using Law of Cosines (c^2 = a^2 + b^2 + 2ab*Cos(C)) to get the length
