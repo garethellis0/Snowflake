@@ -72,7 +72,10 @@ if (CATKIN_ENABLE_TESTING)
         test/lidar-obstacle-manager-test.cpp
         src/LidarObstacleManager.cpp
         src/LidarObstacle.cpp)
-    target_link_libraries(lidar-obstacle-manager-test ${catkin_LIBRARIES})
+    target_link_libraries(lidar-obstacle-manager-test
+            ${catkin_LIBRARIES}
+            ${sb_utils_LIBRARIES}
+            )
 
     catkin_add_gtest(lidar-obstacle-test 
         test/lidar-obstacle-test.cpp

@@ -22,13 +22,29 @@ class SlopeInterceptLine {
     SlopeInterceptLine(double slope, double y_intercept)
       : slope(slope), y_intercept(y_intercept) {}
 
-    // TODO: DOC functions
+    /**
+     * Returns the slope of the line
+     * @return the slope of the line
+     */
     inline double getSlope() { return slope; }
 
+    /**
+     * Returns the y-intercept of this line (ie. where x=0)
+     * @return the y-intercept of this line
+     */
     inline double getYIntercept() { return y_intercept; }
 
+    /**
+     * Returns the x-intercept of this line (ie. where y=0)
+     * @return the x-intercept of this line
+     */
     inline double getXIntercept() { return -y_intercept / slope; }
 
+    /**
+     * Gets the x-coordinate at a given y-coordinate
+     * @param y the y-coordinate to find the x-coordinate at
+     * @return the x coordinate at the given y coordinate
+     */
     inline double getXCoorAtY(double y) {
         if (slope == 0)
             return y_intercept;
@@ -36,6 +52,11 @@ class SlopeInterceptLine {
             return (y - y_intercept) / slope;
     }
 
+    /**
+     * Gets the y-coordinate at a given x-coordinate
+     * @param y the x-coordinate to find the y-coordinate at
+     * @return the y coordinate at the given x coordinate
+     */
     inline double getYCoorAtX(double x) { return slope * x + y_intercept; }
 
   protected:
@@ -51,7 +72,22 @@ class LineOfBestFit : public SlopeInterceptLine {
     LineOfBestFit(double slope, double y_intercept, double correlation)
       : SlopeInterceptLine(slope, y_intercept), correlation(correlation) {}
 
+    /**
+     * Gets the correlation of this line
+     *
+     * @return the correlation of this line
+     */
+    double inline getCorrelation() { return correlation; }
     // TODO: Add getter function and make private
+
+    /**
+     * Sets the correlation of this line
+     * @param correlation the new correlation of the line
+     */
+    void inline setCorrelation(double correlation) { this->correlation = correlation; }
+
+private:
+    // The strength of the correlation
     double correlation;
 };
 
@@ -64,7 +100,15 @@ struct FiniteLine {
 
 class LidarObstacleManager {
   public:
-    LidarObstacleManager();
+    /**
+     * Empty constructor for LidarObstacleManager
+     *
+     * Sets all options to 0, not very useful
+     */
+    LidarObstacleManager() :
+        LidarObstacleManager(
+                0,0,0,0,0,0,0,0,0,true
+        ) {};
 
     LidarObstacleManager(double max_obstacle_merging_distance,
                          double cone_grouping_tolerance,

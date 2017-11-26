@@ -7,6 +7,9 @@
 #include <LidarObstacleManager.h>
 #include <cmath>
 #include <stack>
+#include <RvizUtils.h>
+
+using namespace snowbots;
 
 // TODO: We should not be doing ANYTHING with collisions
 LidarObstacleManager::LidarObstacleManager(
@@ -68,7 +71,6 @@ void LidarObstacleManager::addLaserScan(const sensor_msgs::LaserScan& scan) {
         }
     }
 
-    // TODO: We should not be doing *anything* here to do with collisions
     int side_region_total_size =
     (side_angle_max - side_angle_min) / scan.angle_increment;
 
@@ -96,7 +98,6 @@ void LidarObstacleManager::clearObstacles() {
 void LidarObstacleManager::addObstacle(LidarObstacle obstacle) {
     // See if this obstacle is close enough to any other saved obstacle to be
     // the same
-    // TODO: Should we be instead checking for the CLOSEST saved obstcle?
     for (LidarObstacle& saved_obstacle : obstacles) {
         if (minDistanceBetweenObstacles(saved_obstacle, obstacle) <
             max_obstacle_merging_distance) {
@@ -267,7 +268,7 @@ LineOfBestFit LidarObstacleManager::getBestLine(bool lineToTheRight) {
                 max_distance_from_robot_accepted) {
                 // If correlation is stronger than the current best, update best
                 // line.
-                if (fabs(line.correlation) > fabs(bestLine.correlation))
+                if (fabs(line.getCorrelation()) > fabs(bestLine.getCorrelation()))
                     bestLine = line;
             }
         }
@@ -276,57 +277,42 @@ LineOfBestFit LidarObstacleManager::getBestLine(bool lineToTheRight) {
 }
 
 void LidarObstacleManager::setConeRVizMarkerColor(float red, float green, float blue, float alpha) {
-    rviz_cone_marker_color.r = red;
-    rviz_cone_marker_color.g = red;
-    rviz_cone_marker_color.b = blue;
-    rviz_cone_marker_color.a = alpha;
+    rviz_cone_marker_color = RvizUtils::createMarkerColor(red, green, blue, alpha);
 }
 
 void LidarObstacleManager::setConeRVizMarkerSize(float size) {
-    rviz_cone_marker_scale.x = size;
-    rviz_cone_marker_scale.y = size;
+    rviz_cone_marker_scale = RvizUtils::createrMarkerScale(size, size, size);
 }
 
 void LidarObstacleManager::setLineRVizMarkerColor(float red, float green, float blue, float alpha) {
-    rviz_line_marker_color.r = red;
-    rviz_line_marker_color.g = green;
-    rviz_line_marker_color.b = blue;
-    rviz_line_marker_color.a = alpha;
+    rviz_line_marker_color = RvizUtils::createMarkerColor(red, green, blue, alpha);
 }
 
 void LidarObstacleManager::setLineRVizMarkerSize(float size) {
-    rviz_line_marker_scale.x = size;
-    rviz_line_marker_scale.y = size;
+    rviz_line_marker_scale = RvizUtils::createrMarkerScale(size, size, size);
 }
-
 // TODO: Most of this visualisation stuff can come from Robyn's new `RVizUtil` class
 
 visualization_msgs::Marker LidarObstacleManager::getConesRVizMarkers() {
-    visualization_msgs::Marker points;
-
-    points.header.frame_id    = rviz_marker_frame_id;
-    points.header.stamp       = ros::Time::now();
-    points.ns                 = "debug";
-    points.action             = visualization_msgs::Marker::ADD;
-    points.pose.orientation.w = 1.0;
-    points.id                 = 0;
-    points.type = visualization_msgs::Marker::POINTS;
-    points.scale = rviz_cone_marker_scale;
-    points.color = rviz_cone_marker_color;
-
+    std::vector<geometry_msgs::Point> points;
     for (LidarObstacle obstacle : obstacles) {
         if (obstacle.getObstacleType() == CONE) {
-            Point center = obstacle.getCenter();
-            geometry_msgs::Point geom_point;
-            geom_point.x = center.x;
-            geom_point.y = center.y;
-            points.points.push_back(geom_point);
+            geometry_msgs::Point point;
+            point.x = obstacle.getCenter().x;
+            point.y = obstacle.getCenter().y;
+            points.emplace_back(point);
         }
     }
-
-    return points;
+    return RvizUtils::displayPoints(
+            points,
+            rviz_cone_marker_color,
+            rviz_cone_marker_scale,
+            rviz_marker_frame_id,
+            "debug");
 }
 
+// TODO: Most of this visualisation stuff can come from Robyn's new `RVizUtil` class
+// TODO: Add functions to the `RVizUtil` class for creation of line visualisations
 visualization_msgs::Marker LidarObstacleManager::getConeLinesRVizMarker() {
     visualization_msgs::Marker lines;
 
@@ -378,7 +364,7 @@ LidarObstacleManager::getBestConeLineRVizMarker(bool line_to_the_right) {
     // TODO: Find a better way to sync this logic up. Copy pasting sucks
     LineOfBestFit best_line = getBestLine(line_to_the_right);
     // If no line found on desired side
-    if (best_line.correlation == 0) best_line = getBestLine(!line_to_the_right);
+    if (best_line.getCorrelation() == 0) best_line = getBestLine(!line_to_the_right);
     geometry_msgs::Point p1, p2;
     p1.x = -10;
     p1.y = best_line.getYCoorAtX(p1.x);

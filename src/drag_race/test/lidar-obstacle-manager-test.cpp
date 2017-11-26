@@ -277,47 +277,6 @@ TEST_F(LidarObstacleManagerTest, obstacleInFront) {
     // EXPECT_TRUE(man.collisionDetected());
 }
 
-TEST_F(LidarObstacleManagerTest, getConeRVizMarkerTest) {
-    // Add some obstacles
-    obstacle_manager_1.addObstacle(cone1);
-    obstacle_manager_1.addObstacle(cone2);
-    obstacle_manager_1.addObstacle(cone3);
-    obstacle_manager_1.addObstacle(cone4);
-    std::vector<LidarObstacle> obstacles = obstacle_manager_1.getObstacles();
-
-    visualization_msgs::Marker obstacle_markers = obstacle_manager_1.getConesRVizMarkers();
-
-    EXPECT_EQ(4, obstacle_markers.points.size());
-    EXPECT_EQ((int)visualization_msgs::Marker_::POINTS, obstacle_markers.type);
-    EXPECT_EQ((int)visualization_msgs::Marker::ADD, obstacle_markers.action);
-
-    // Check that the position of the markers matches that of the obstacles
-    std::vector<Point> expected_marker_points;
-    for (auto& obstacle : obstacles){
-        expected_marker_points.emplace_back(obstacle.getCenter());
-    }
-    std::vector<Point> actual_marker_points;
-    for (auto& point: obstacle_markers.points) {
-        actual_marker_points.emplace_back(Point{point.x, point.y});
-    }
-    // We don't care about the order
-    std::sort(expected_marker_points.begin(), expected_marker_points.end());
-    std::sort(actual_marker_points.begin(), actual_marker_points.end());
-
-    EXPECT_EQ(expected_marker_points, actual_marker_points);
-}
-
-TEST_F(LidarObstacleManagerTest, getConeLinesRVizMarkerTest) {
-    obstacle_manager_1.addObstacle(cone1);
-    obstacle_manager_1.addObstacle(cone4);
-
-    visualization_msgs::Marker line_markers = obstacle_manager_1.getConeLinesRVizMarker();
-}
-
-TEST_F(LidarObstacleManagerTest, getBestConeLinesRVizMarkerTest) {
-    // TODO: You are here
-}
-
 int main(int argc, char** argv) {
     testing::InitGoogleTest(&argc, argv);
     ::testing::InitGoogleTest(&argc, argv);

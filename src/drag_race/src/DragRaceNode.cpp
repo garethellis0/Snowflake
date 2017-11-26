@@ -144,7 +144,7 @@ void DragRaceNode::scanCallBack(const sensor_msgs::LaserScan::ConstPtr& scan) {
     LineOfBestFit best_line = obstacle_manager.getBestLine(line_to_the_right);
 
     // If no good lines, initiate plan B and use lines on the other side.
-    if (best_line.correlation == 0) {
+    if (best_line.getCorrelation() == 0) {
         best_line = obstacle_manager.getBestLine(!line_to_the_right);
         no_line_on_expected_side = true;
     }

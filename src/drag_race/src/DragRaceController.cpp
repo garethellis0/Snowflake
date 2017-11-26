@@ -56,7 +56,7 @@ DragRaceController::determineDesiredMotion(LineOfBestFit longestConeLine,
     command.angular.y = 0;
 
     // If no line then go straight.
-    if (longestConeLine.correlation == 0)
+    if (longestConeLine.getCorrelation() == 0)
         command.angular.z = 0;
     else
         // Figure out how fast we should be turning
