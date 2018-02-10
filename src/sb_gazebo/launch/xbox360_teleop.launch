@@ -1,3 +1,7 @@
+<!--
+    Driver for a Xbox 360 controller so that we can drive the robot
+-->
+
 <launch>
   <!--
     Push the left frontal button labeled as 'LB' to activate cmd_vel publishing.

@@ -1,3 +1,7 @@
+<!--
+    This lets us drive the robot with a keyboard
+-->
+
 <launch>
   <!-- turtlebot_teleop_key already has its own built in velocity smoother -->
   <node pkg="sb_gazebo" type="teleop_twist_keyboard" name="keyboard_teleop"  output="screen">

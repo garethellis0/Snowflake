@@ -15,7 +15,7 @@
       right_back_wheel_controller"
   />
 
-  <include file="$(find sb_gazebo)/launch/general_robot_control.launch">
+  <include file="$(find sb_gazebo)/launch/elsa/general_robot_control.launch">
     <arg name="robot" value="elsa"/>
   </include> 
 

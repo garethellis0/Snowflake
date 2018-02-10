@@ -3,6 +3,7 @@
  * Created On: May 1 2017
  * Description: A node which transforms a given pointcloud from
  *              it's current frame to a given frame
+ *              TODO: What are we using this for??
  */
 
 #include <geometry_msgs/TransformStamped.h>
