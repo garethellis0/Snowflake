@@ -1,6 +1,6 @@
 <launch>
 
-    <!-- Runs a rough approximation of the IGVC Basic Course in Gazebo -->    
+    <!-- Runs a rough approximation of the IGVC Qualification Course in Gazebo -->    
 
     <!-- Start the world -->
     <include file="$(find sb_gazebo)/launch/util/open_world.launch">
