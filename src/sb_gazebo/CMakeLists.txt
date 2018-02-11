@@ -5,12 +5,14 @@ project(sb_gazebo)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  gazebo_ros
+  rospy
+  roscpp
   tf2
   tf2_ros
   tf2_msgs
   tf2_sensor_msgs
   geometry_msgs
+  gazebo_ros
 )
 
 find_package(sb_utils REQUIRED)
@@ -19,11 +21,6 @@ add_definitions(-std=c++14)
 
 catkin_package(
 #  INCLUDE_DIRS include
-)
-
-catkin_install_python(PROGRAMS
-   scripts/teleop_twist_keyboard
-   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
 ###########
@@ -59,3 +56,16 @@ target_link_libraries(zed_transform ${catkin_LIBRARIES} ${sb_utils_LIBRARIES})
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
+
+
+#############
+## Install ##
+#############
+
+# Install python nodes so that we can run them
+catkin_install_python(PROGRAMS
+   scripts/teleop_twist_keyboard.py
+   scripts/gazebo_launcher.py
+   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
