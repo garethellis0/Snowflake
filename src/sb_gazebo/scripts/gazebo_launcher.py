@@ -3,9 +3,9 @@
 # TODO: remove unused imports
 
 # ROS Imports
-import roslib
 import rospy
 import rospkg
+import roslaunch
 
 # General Imports
 import os
@@ -26,6 +26,10 @@ class GazeboLauncher():
     # (such as the path to various packages)
     rospack = None
 
+    # TODO: Better comment - what are these parts?
+    # The package that contains all the relevant parts to launch Gazebo
+    gazebo_model_package_name = ""
+
     def __init__(self, gazebo_model_package_name, subpath_to_robot_models, subpath_to_world_models):
         """
         :param gazebo_model_package_name: the name of the package containing the robot and world models
@@ -37,9 +41,10 @@ class GazeboLauncher():
 
         # Make sure the gazebo package we were given exists
         package_names = self.rospack.list()
-        if model_package_name not in package_names:
+        if gazebo_model_package_name not in package_names:
             rospy.signal_shutdown("Given package \"" + gazebo_model_package_name + "\" not found")
         else:
+            self.gazebo_model_package_name = gazebo_model_package_name
             self.model_package_path = self.rospack.get_path(model_package_name)
 
         # Make sure that the robot models path we were given exists
@@ -63,12 +68,26 @@ class GazeboLauncher():
         """
         :return: The names of all the worlds in the world models folder
         """
-        # Return the names of all the worlds in the world models folder
+        # Return the names of all the world files in the world models folder
         world_names = []
         for file in os.listdir(self.world_models_path):
-            if file.endswith(".world"):
-                world_names += [file]
+            filename, extension = os.path.splitext(file)
+            if extension == ".world":
+                world_names += [filename]
         return world_names
+
+    # TODO: Add option to set initial robot location?
+    def runGazebo(self, world_name, robot_name):
+        """
+        Tries to find the given world and robot and run Gazebo with them
+        :param world_name: the name of the world to run
+        :param robot_name: the name of the robot to place in the world
+        :return:
+        """
+
+        # TODO: Actually run Gazebo
+
+        print("Ran gazebo!")
 
 
 class GazeboLauncherGui(wx.Frame):
@@ -81,13 +100,15 @@ class GazeboLauncherGui(wx.Frame):
     # The parent of this frame
     parent = None
 
-    # TODO: The GUI probably shouldn't need this
-    # A rospack instance use for ros package operations
-    rospack = rospkg.RosPack()
-
     # A `GazeboLauncher` that we can use for running things
     # and getting information (like a list of robot models and worlds) to display
     gazebo_launcher = None
+
+    # The dropdown menus that will hold the choices the user inputs
+    # these are scoped to the class so callback functions (for example, for buttons)
+    # can see them
+    world_dropdown = None
+    robot_dropdown = None
 
     def __init__(self, parent, id, title, gazebo_launcher):
         """
@@ -122,8 +143,8 @@ class GazeboLauncherGui(wx.Frame):
 
         # The drop-down menu to choose a world
         world_names = self.gazebo_launcher.getWorldNames()
-        world_dropdown = wx.Choice(self, -1, choices=world_names)
-        vertical_box.Add(world_dropdown, flag=wx.EXPAND|wx.LEFT|wx.RIGHT)
+        self.world_dropdown = wx.Choice(self, -1, choices=world_names)
+        vertical_box.Add(self.world_dropdown, flag=wx.EXPAND|wx.LEFT|wx.RIGHT)
 
         # The label for the robot
         robot_label = wx.StaticText(self, -1, "Choose a robot:")
@@ -131,11 +152,45 @@ class GazeboLauncherGui(wx.Frame):
 
         # The drop-down menu to choose a robot
         robot_names = self.gazebo_launcher.getRobotNames()
-        robot_dropdown = wx.Choice(self, -1, choices=robot_names)
-        vertical_box.Add(robot_dropdown, flag=wx.EXPAND|wx.LEFT|wx.RIGHT)
+        self.robot_dropdown = wx.Choice(self, -1, choices=robot_names)
+        vertical_box.Add(self.robot_dropdown, flag=wx.EXPAND|wx.LEFT|wx.RIGHT)
+
+        # The button to run gazebo with the selected choices
+        run_button = wx.Button(self, -1, "Run Gazebo")
+        vertical_box.Add(run_button, flag=wx.EXPAND|wx.LEFT|wx.RIGHT)
+
+        # Add a binding for the callback when the run button is pressed
+        self.Bind(wx.EVT_BUTTON, self.onRun)
 
         self.SetSizerAndFit(vertical_box)
         self.Show(True)
+
+    def onRun(self, event):
+        # Get the index for the users chosen world and robot
+        world_selection_index = self.world_dropdown.GetCurrentSelection()
+        robot_selection_index = self.robot_dropdown.GetCurrentSelection()
+
+        # Check that we've selected a world
+        if world_selection_index == -1:
+            err_dialog = wx.MessageDialog(self, "Please select a world!")
+            err_dialog.ShowModal()
+            return
+
+        # Check that we've selected a robot
+        if robot_selection_index == -1:
+            err_dialog = wx.MessageDialog(self, "Please select a robot!")
+            err_dialog.ShowModal()
+            return
+
+        # Get the string values for the users chosen world and robot
+        world_name = self.world_dropdown.GetString(world_selection_index)
+        robot_name = self.robot_dropdown.GetString(robot_selection_index)
+
+        # Run Gazebo
+        self.gazebo_launcher.runGazebo(world_name, robot_name)
+
+        # TODO: Delete me
+        print("Hit run!")
 
 
 def getParamWithDefault(param_name, default_value):
@@ -152,6 +207,8 @@ def getParamWithDefault(param_name, default_value):
 
 
 if __name__=="__main__":
+
+    # Get RosParams
 
     # The package that contains all the gazebo models for robots and worlds
     model_package_name = getParamWithDefault("model_package_name", "sb_gazebo")
