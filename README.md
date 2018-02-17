@@ -63,6 +63,8 @@ if you're on campus use the `ubcsecure` or `resnet` networks for best results.
     - To check and fix formatting, from the `Snowflake` folder run `./clang_format/fix_formatting.sh BRANCH_NAME`, where `BRANCH_NAME` is the name of the branch you intend to merge your code into (ex. `iarrc` or `core`). This script will fix any improperly formatted code, but will refuse to change any files with uncommited changes (to prevent you losing work)
 
 ### Coding Conventions
+
+## C++
 - Every **.cpp** and **.h** file should start with 
 ```
 /*
@@ -94,6 +96,9 @@ if you're on campus use the `ubcsecure` or `resnet` networks for best results.
 - Constants are **ALL_CAPS_WITH_UNDERSCORES**
 - Functions are **camelCase**
 - Indentations are 4 spaces
+
+## Python
+- Unless otherwise specified, we follow [PEP 8](https://www.python.org/dev/peps/pep-0008/)
 
 ### Coordinate Systems
 - We try to follow ROS standards, which can be found [here](http://www.ros.org/reps/rep-0103.html)
