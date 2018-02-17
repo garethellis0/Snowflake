@@ -85,7 +85,20 @@ class GazeboLauncher():
         :return:
         """
 
-        # TODO: Actually run Gazebo
+        # The node we're going to run (note that this does not actually run the node)
+        package = "gazebo_ros"
+        executable = "gazebo"
+        gazebo_node = roslaunch.core.Node(package, executable, name="gazebo")
+
+        # The `ROSLaunch` object that will launch the node
+        launch = roslaunch.scriptapi.ROSLaunch()
+        launch.start()
+
+        # Run the Gazebo Node
+        process = launch.launch(gazebo_node)
+        # TODO: You are here - looks like Gazebo is crashing... maybe because of your laptop?
+        # TODO: Try running this on your desktop?
+        print process.is_alive()
 
         print("Ran gazebo!")
 
