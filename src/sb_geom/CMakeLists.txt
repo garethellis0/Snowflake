@@ -62,7 +62,7 @@ file(GLOB sb_geom_SRCS
         "src/*.cpp"
         )
 file(GLOB sb_geom_HEADERS
-        "include/*.h"
+        "include/sb_geom/*.h"
         )
 add_library(sb_geom
         ${sb_geom_SRCS}
@@ -76,14 +76,23 @@ add_library(sb_geom
 
 if (CATKIN_ENABLE_TESTING)
 
-    catkin_add_gtest(Point2D-test
-            test/Point2D-test.cpp
+    catkin_add_gtest(point2d-test
+            test/point2d-test.cpp
+            # We need to add this line to find the custom message header files
+            # (to stop Clion complaining it can't find them)
+            ${HEADER_FILES}
             )
-    target_link_libraries(Point2D-test ${catkin_LIBRARIES})
+    target_link_libraries(point2d-test ${catkin_LIBRARIES})
     # We need to declare this extra dependecy to ensure custom messages
     # in this package are generated first (since this test is in the same
     # package that the messages are being generated in)
-    add_dependencies(Point2D-test sb_geom_generate_messages_cpp)
+    add_dependencies(point2d-test sb_geom_generate_messages_cpp)
+
+    catkin_add_gtest(polyline-test
+            test/polyline-test.cpp
+            src/PolyLine.cpp
+            )
+    target_link_libraries(polyline-test ${catkin_LIBRARIES})
 
 endif()
 

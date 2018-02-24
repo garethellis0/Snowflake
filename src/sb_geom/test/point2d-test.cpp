@@ -5,7 +5,9 @@
  */
 
 #include <gtest/gtest.h>
-#include <sb_geom/Point2D.h>
+#include "sb_geom/Point2D.h"
+
+using namespace sb_geom;
 
 class Point2DTest : public testing::Test {
 protected:
@@ -21,8 +23,8 @@ TEST_F(Point2DTest, test_message_building){
     sb_geom::Point2D point;
     point.x = 1;
     point.y = 2;
-    EXPECT_EQ(point.x,1);
-    EXPECT_EQ(point.y,2);
+    EXPECT_EQ(1, point.x);
+    EXPECT_EQ(2, point.y);
 }
 
 
