@@ -9,6 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
     message_generation
     std_msgs
     sb_utils
+    ecl_geometry
 )
 
 
@@ -83,11 +84,13 @@ include_directories(
 
 ## Add gtest based cpp test target and link libraries
 if (CATKIN_ENABLE_TESTING)
+
     catkin_add_gtest(obstacle-manager-test
             test/obstacle-manager-test.cpp
             src/ObstacleManager.cpp
             include/ObstacleManager.h
             )
+
     target_link_libraries(obstacle-manager-test
             ${catkin_LIBRARIES}
             )

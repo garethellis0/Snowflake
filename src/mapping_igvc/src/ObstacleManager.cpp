@@ -9,8 +9,6 @@
 #include <algorithm>
 #include <tuple>
 
-using namespace sb_geom;
-
 ObstacleManager::ObstacleManager(double cone_merging_tolerance, double line_merging_tolerance) :
 cone_merging_tolerance(cone_merging_tolerance),
 line_merging_tolerance(line_merging_tolerance)
@@ -59,11 +57,12 @@ void ObstacleManager::addObstacle(Cone cone) {
 }
 
 // TODO: The `addObstacle` functions seem pretty similar.... maybe we could apply DRY here?
-void ObstacleManager::addObstacle(PolyLine line) {
+template <int T>
+void ObstacleManager::addObstacle(Polynomial<T> line, double start_point, double end_point){
     // Find the distance from this line to every other known line
     std::vector<std::pair<double, int>> distances;
     for (int line_index = 0; line_index < lines.size(); line_index++) {
-        double distance = distanceBetweenLines(lines[line_index], line);
+        double distance = distanceBetweenSplineAndPolynomial<T>(lines[line_index], line);
         distances.emplace_back(std::make_pair(distance, line_index));
     }
 
@@ -81,30 +80,16 @@ void ObstacleManager::addObstacle(PolyLine line) {
 
         if (distance_to_closest_known_line < line_merging_tolerance){
             // Update our current knowledge of the line based on the new line
-            SplineLine merged_line = updateLineWithNewLine(lines[closest_known_line_index], line);
+            Spline merged_line = updateLineWithNewLine(lines[closest_known_line_index], line);
             // Overwrite the old line with our new merged line
             lines[closest_known_line_index] = merged_line;
         } else {
             // The closest line to this one isn't close enough to merge into,
             // so just add this line as a new line
-            lines.emplace_back(SplineLine(line));
+            lines.emplace_back(splineFromPolynomial(line));
         }
     } else {
         // We don't know about any lines yet, so just add this one as it's own line
-        lines.emplace_back(SplineLine(line));
+        lines.emplace_back(splineFromPolynomial(line));
     }
 }
-
-double ObstacleManager::distanceBetweenLines(SplineLine spline_line,
-                                             PolyLine poly_line) {
-    // TODO
-    return 0;
-}
-
-SplineLine ObstacleManager::updateLineWithNewLine(SplineLine current_line,
-                                                  PolyLine new_line) {
-    // TODO
-    return SplineLine(PolyLine());
-}
-
-
