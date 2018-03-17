@@ -1,9 +1,12 @@
 /*
  * Created By: Gareth Ellis
- * Created On: January 9, 2018
+ * Created On: March 16, 2018
  * Description: TODO
- *              This file contains all fully implemented (ie. non-templated) functions
+ *              TODO - explain why this is in a `.tpp` file
  */
+
+#ifndef MAPPING_IGVC_OBSTACLEMANAGER_IMPL_H
+#define MAPPING_IGVC_OBSTACLEMANAGER_IMPL_H
 
 #include <ObstacleManager.h>
 #include <cmath>
@@ -11,8 +14,8 @@
 #include <tuple>
 
 ObstacleManager::ObstacleManager(double cone_merging_tolerance, double line_merging_tolerance) :
-cone_merging_tolerance(cone_merging_tolerance),
-line_merging_tolerance(line_merging_tolerance)
+        cone_merging_tolerance(cone_merging_tolerance),
+        line_merging_tolerance(line_merging_tolerance)
 {}
 
 std::vector<Cone> ObstacleManager::getConeObstacles() {
@@ -34,8 +37,8 @@ void ObstacleManager::addObstacle(Cone cone) {
 
     // Find the closest known cone (min element by distance)
     auto min_element = std::min_element(distances.begin(), distances.end(),
-                               [&](auto pair1, auto pair2){return pair1.first < pair2.first;}
-                        );
+                                        [&](auto pair1, auto pair2){return pair1.first < pair2.first;}
+    );
 
     // Make sure that we were at least able to find one cone
     if (min_element != distances.end()){
@@ -94,3 +97,5 @@ void ObstacleManager::addObstacle(ecl::Polynomial<T> line, double start_point, d
         lines.emplace_back(splineFromPolynomial(line));
     }
 }
+
+#endif // MAPPING_IGVC_OBSTACLEMANAGER_IMPL_H

@@ -133,5 +133,6 @@ private:
     std::vector<Spline> lines;
 };
 
+#include "ObstacleManager.tpp"
 
 #endif //MAPPING_IGVC_OBSTACLEMANAGER_H

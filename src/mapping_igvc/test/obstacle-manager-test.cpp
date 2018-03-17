@@ -125,6 +125,13 @@ TEST_F(ObstacleManagerTest, add_several_cones){
     EXPECT_EQ(expected, actual);
 }
 
+TEST_F(ObstacleManagerTest, add_single_line_no_known_lines){
+    ObstacleManager obstacle_manager(1.0, 1.0);
+
+    ecl::Polynomial<3> test;
+    obstacle_manager.addObstacle<3>(test, 0, 1);
+}
+
 
 int main(int argc, char **argv) {
     testing::InitGoogleTest(&argc, argv);

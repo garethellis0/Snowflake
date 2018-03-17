@@ -87,8 +87,8 @@ if (CATKIN_ENABLE_TESTING)
 
     catkin_add_gtest(obstacle-manager-test
             test/obstacle-manager-test.cpp
-            src/ObstacleManager.cpp
             include/ObstacleManager.h
+            include/ObstacleManager.tpp
             )
 
     target_link_libraries(obstacle-manager-test
