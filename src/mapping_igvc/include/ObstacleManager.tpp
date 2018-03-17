@@ -8,14 +8,17 @@
 #ifndef MAPPING_IGVC_OBSTACLEMANAGER_IMPL_H
 #define MAPPING_IGVC_OBSTACLEMANAGER_IMPL_H
 
-#include <ObstacleManager.h>
+// STD Includes
 #include <cmath>
 #include <algorithm>
 #include <tuple>
 
-ObstacleManager::ObstacleManager(double cone_merging_tolerance, double line_merging_tolerance) :
+ObstacleManager::ObstacleManager(double cone_merging_tolerance,
+                                 double line_merging_tolerance,
+                                 double polynomial_sampling_length) :
         cone_merging_tolerance(cone_merging_tolerance),
-        line_merging_tolerance(line_merging_tolerance)
+        line_merging_tolerance(line_merging_tolerance),
+        polynomial_sampling_length(polynomial_sampling_length)
 {}
 
 std::vector<Cone> ObstacleManager::getConeObstacles() {
@@ -61,12 +64,12 @@ void ObstacleManager::addObstacle(Cone cone) {
 }
 
 // TODO: The `addObstacle` functions seem pretty similar.... maybe we could apply DRY here?
-template <int T>
-void ObstacleManager::addObstacle(ecl::Polynomial<T> line, double start_point, double end_point){
+template <int N>
+void ObstacleManager::addObstacle(ecl::Polynomial<N> line, double start_x, double end_x){
     // Find the distance from this line to every other known line
     std::vector<std::pair<double, int>> distances;
     for (int line_index = 0; line_index < lines.size(); line_index++) {
-        double distance = distanceBetweenSplineAndPolynomial<T>(lines[line_index], line);
+        double distance = distanceBetweenSplineAndPolynomial<N>(lines[line_index], line);
         distances.emplace_back(std::make_pair(distance, line_index));
     }
 
@@ -84,18 +87,83 @@ void ObstacleManager::addObstacle(ecl::Polynomial<T> line, double start_point, d
 
         if (distance_to_closest_known_line < line_merging_tolerance){
             // Update our current knowledge of the line based on the new line
-            Spline merged_line = updateLineWithNewLine(lines[closest_known_line_index], line);
+            Spline merged_line = updateLineWithNewLine<N>(lines[closest_known_line_index], line);
             // Overwrite the old line with our new merged line
             lines[closest_known_line_index] = merged_line;
         } else {
             // The closest line to this one isn't close enough to merge into,
             // so just add this line as a new line
-            lines.emplace_back(splineFromPolynomial(line));
+            lines.emplace_back(splineFromPolynomial<N>(line, start_x, end_x));
         }
     } else {
         // We don't know about any lines yet, so just add this one as it's own line
-        lines.emplace_back(splineFromPolynomial(line));
+        lines.emplace_back(splineFromPolynomial<N>(line, start_x, end_x));
     }
+}
+
+template<int N>
+double ObstacleManager::distanceBetweenSplineAndPolynomial(
+        ObstacleManager::Spline spline,
+        ObstacleManager::Polynomial<N> poly_line) {
+    // TODO
+    return 0;
+}
+
+template<int N>
+ObstacleManager::Spline
+ObstacleManager::updateLineWithNewLine(ObstacleManager::Spline current_line,
+                                       ObstacleManager::Polynomial<N> new_line) {
+    // TODO
+    return ObstacleManager::Spline();
+}
+
+template<int N>
+ObstacleManager::Spline ObstacleManager::splineFromPolynomial(
+        ObstacleManager::Polynomial<N> polynomial,
+        double start_x,
+        double end_x
+) {
+    // We will approximate this polynomial via a spline passing through:
+    // - the start point of the polynomial
+    // - the end point of the polynomial
+    // - a sampling of points at pre-determined distances along the polynomial
+
+    std::vector<double> x_set_vec;
+    std::vector<double> y_set_vec;
+
+    // Add the start and middle points
+    double curr_x = start_x;
+    while (curr_x < end_x - polynomial_sampling_length){
+        // Add the current point
+        x_set_vec.emplace_back(curr_x);
+        y_set_vec.emplace_back(polynomial(curr_x));
+
+        // Try and move `polynomial_sampling_length` up the line
+        // We do this via an approximation with derivative of the line at the
+        // current point
+        double slope_angle = atan(polynomial.derivative(curr_x));
+
+        curr_x += std::cos(slope_angle) * polynomial_sampling_length;
+    }
+
+    // Add the end point
+    x_set_vec.emplace_back(end_x);
+    y_set_vec.emplace_back(polynomial(end_x));
+
+    // Copy over the points into ecl_geometry's container
+    ecl::Array<double, ecl::DynamicStorage> x_set;
+    ecl::Array<double, ecl::DynamicStorage> y_set;
+    x_set.resize(x_set_vec.size());
+    y_set.resize(y_set_vec.size());
+    for (int i = 0; i < x_set.size(); i++){
+        x_set[i] = x_set_vec[i];
+        y_set[i] = y_set_vec[i];
+    }
+
+    // Generate the spline
+    ObstacleManager::Spline spline;
+    spline = ObstacleManager::Spline::Natural(x_set, y_set);
+    return spline;
 }
 
 #endif // MAPPING_IGVC_OBSTACLEMANAGER_IMPL_H

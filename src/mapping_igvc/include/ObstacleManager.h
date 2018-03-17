@@ -2,6 +2,7 @@
  * Created By: Gareth Ellis
  * Created On: January 9, 2018
  * Description: TODO
+ *              TODO - note that CLion throws a lot of false errors in this file
  */
 
 #ifndef MAPPING_IGVC_OBSTACLEMANAGER_H
@@ -70,8 +71,13 @@ public:
      * two cones for them to be considered different from each other
      * (and so not merged)
      * @param line_merging_tolerance TODO
+     * // TODO: Better name for this?
+     * @param polynomial_sampling_length the length at which to sample a
+     * polynomial line when converting it to a spline
      */
-    explicit ObstacleManager(double cone_merging_tolerance, double line_merging_tolerance);
+    explicit ObstacleManager(double cone_merging_tolerance,
+                             double line_merging_tolerance,
+                             double polynomial_sampling_length);
 
     /**
      * Add a given cone to our map of the world
@@ -79,18 +85,31 @@ public:
      */
     void addObstacle(Cone cone);
 
-    /**Degree
+    /**
      * Add a given line to our map of the world
+     * @tparam N the degree of the given Polynomial line
      * @param line the line to add
      */
-    template <int T>
-    void addObstacle(Polynomial<T> line, double start_point, double end_point);
+    template <int N>
+    void addObstacle(Polynomial<N> line, double start_x, double end_x);
 
     /**
      * Get all the cones in our world
      * @return a list of all known cones in our world
      */
     std::vector<Cone> getConeObstacles();
+
+    /**
+     * Generate a spline from a segment of a given polynomial line
+     * @tparam N the degree of the given polynomial line
+     * @param polynomial the given polynomial line
+     * @param start_x the x value the segment of the polynomial starts at
+     * @param end_x the x value the segment of the polynomial ends at
+     * @return a Spline generated from a given Polynomial line segment
+     */
+    template <int N>
+    Spline splineFromPolynomial(Polynomial<N> polynomial, double start_x, double end_x);
+
 
 private:
 
@@ -100,8 +119,8 @@ private:
      * @param poly_line a polynomial line
      * @return the minimum distance between the spline and polynomial lines
      */
-    template <int T>
-    double distanceBetweenSplineAndPolynomial(Spline spline, Polynomial<T> poly_line);
+    template <int N>
+    double distanceBetweenSplineAndPolynomial(Spline spline, Polynomial<N> poly_line);
 
     /**
      * Merges the new line into the current line to come up with an updated line
@@ -112,11 +131,8 @@ private:
      * @param new_line the newly found line
      * @return the merged line
      */
-    template <int T>
-    Spline updateLineWithNewLine(Spline current_line, Polynomial<T> new_line);
-
-    template <int T>
-    Spline splineFromPolynomial(Polynomial<T> polynomial);
+    template <int N>
+    Spline updateLineWithNewLine(Spline current_line, Polynomial<N> new_line);
 
     // the minimum distance between the center of two cones for them to be
     // considered different from each other (and so not merged)
@@ -131,6 +147,10 @@ private:
 
     // all known lines in our world
     std::vector<Spline> lines;
+
+    // the length at which to sample a polynomial line when converting it to a
+    // spline
+    double polynomial_sampling_length;
 };
 
 #include "ObstacleManager.tpp"

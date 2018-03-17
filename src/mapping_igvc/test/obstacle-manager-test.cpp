@@ -10,7 +10,7 @@
 class ObstacleManagerTest : public testing::Test {
 protected:
     ObstacleManagerTest():
-            obstacle_manager_with_one_cone(0.5, 0)
+            obstacle_manager_with_one_cone(0.5, 0, 0)
             {}
 
     virtual void SetUp() {
@@ -84,7 +84,7 @@ TEST_F(ObstacleManagerTest, add_cone_within_of_merging_tolerance_negative_coordi
 }
 
 TEST_F(ObstacleManagerTest, add_several_cones){
-    ObstacleManager obstacle_manager(1,0);
+    ObstacleManager obstacle_manager(1, 0, 0);
 
     // A list of a cones, all within merging tolerance of each other
     std::vector<Cone> cones_within_merging_tolerance = {
@@ -125,11 +125,30 @@ TEST_F(ObstacleManagerTest, add_several_cones){
     EXPECT_EQ(expected, actual);
 }
 
+// TODO - YOU ARE HERE -  need to write these tests
+TEST_F(ObstacleManagerTest, splineFromPolynomial_horizontal_polynomial){
+   // TODO
+}
+
+TEST_F(ObstacleManagerTest, splineFromPolynomial_vertical_polynomial){
+    // TODO
+}
+
+TEST_F(ObstacleManagerTest, splineFromPolynomial_simple_polynomial){
+    // TODO
+}
+
+TEST_F(ObstacleManagerTest, splineFromPolynomial_complex_polynomial){
+    // TODO
+}
+
+// TODO: This is not a real test - make it one or delete it
 TEST_F(ObstacleManagerTest, add_single_line_no_known_lines){
-    ObstacleManager obstacle_manager(1.0, 1.0);
+    ObstacleManager obstacle_manager(1.0, 1.0, 0.1);
 
     ecl::Polynomial<3> test;
-    obstacle_manager.addObstacle<3>(test, 0, 1);
+    obstacle_manager.addObstacle<3>(test, 0, 0.3);
+
 }
 
 
