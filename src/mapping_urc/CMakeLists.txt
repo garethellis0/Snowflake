@@ -7,11 +7,18 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     set_property(CACHE CMAKE_BUILD_TYPE PROPERTY VALUE "Release")
 endif()
 
+# This exports the compile commands so people using Vim with YouCompleteMe
+# can have easy autocompletion
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 add_definitions(--std=c++14)
 
 ## Find catkin macros and libraries
 find_package(catkin REQUIRED COMPONENTS
     roscpp
+    sb_utils
+    sb_geom
+    mapping_msgs_urc
 )
 
 # Bring in the `multi_resolution_graph` library
@@ -34,7 +41,11 @@ include_directories(
 )
 
 ## Declare a C++ executable
-# TODO: Issue #348
+add_executable(mapper_node 
+    src/mapper_node.cpp
+    src/MapperNode.cpp
+        src/Mapper.cpp include/Mapper.h)
+target_link_libraries(mapper_node ${catkin_LIBRARIES})
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(${PROJECT_NAME}_node
