@@ -44,7 +44,7 @@ include_directories(
 add_executable(mapper_node 
     src/mapper_node.cpp
     src/MapperNode.cpp
-        src/Mapper.cpp include/Mapper.h)
+        src/Mapper.cpp include/Mapper.h src/WorldMap.cpp)
 target_link_libraries(mapper_node ${catkin_LIBRARIES})
 
 ## Specify libraries to link a library or executable target against

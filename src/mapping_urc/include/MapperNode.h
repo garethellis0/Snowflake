@@ -34,6 +34,9 @@ private:
     // The subscriber to all the risk area array messages
     ros::Subscriber risk_area_array_subscriber;
 
+    // The publisher for our output occupancy grid
+    ros::Publisher occ_grid_publisher;
+
     // The mapper that handles all the map updates and produces a nice cost-map
     // for us
     Mapper mapper;

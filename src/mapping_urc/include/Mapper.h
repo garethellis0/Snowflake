@@ -14,7 +14,7 @@
 #include "WorldMap.h"
 
 // TODO: Comment here
-struct AreaWithScore {
+struct RiskArea {
     // TODO: Comment here
     sb_geom::Polygon2D area;
 
@@ -39,19 +39,32 @@ public:
      */
     void createNextMap();
 
-    // TODO: Should this be private
+    // TODO: Should this be private?
+    // TODO: TEST ME!
     /**
      * Generates a new graph big enough to contain the previous graph and all new risk areas. Also sets the resolutions on the graph appropriately.
      * @return TODO
      */
-    std::shared_ptr<multi_resolution_graph::GraphNode<CostCell>> generateEmptyGraph();
+    WorldMap generateEmptyMap();
+
+    /**
+     * Updates the given WorldMap with the given RiskAreas
+     *
+     * @param map the map to update
+     * @param areas all the new RiskAreas to update the map with
+     */
+    static void updateMapWithRiskAreas(WorldMap& map, std::vector<RiskArea> areas);
 
 private:
     // TODO: Comment here
     struct GraphBounds {
-        double min_x, max_x, min_y, max_y;
+        double min_x;
+        double max_x;
+        double min_y;
+        double max_y;
     };
 
+    // TODO: Test me!
     /**
      * Calculates the bounds for the new graph
      *
@@ -62,9 +75,9 @@ private:
      */
     GraphBounds getNewGraphBounds();
 
-    // The areas with associated score we're seen so far
-    std::vector<AreaWithScore> areas_with_scores;
+    // The areas with associated score we're seen since the generated the previous map
+    std::vector<RiskArea> risk_areas;
 
     // The last map we generated
-    std::shared_ptr<WorldMap> prev_map;
+    WorldMap prev_map;
 };
