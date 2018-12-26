@@ -59,6 +59,30 @@ TEST_F(Polygon2DTest, constructing_from_polygon2d_msg) {
     EXPECT_EQ(points, polygon2D.getBoundaryPoints());
 }
 
+TEST_F(Polygon2DTest, getMinX) {
+    std::vector<sb_geom::Point2D> points = {{10, 20}, {34.22, 9}, {34, 9.33}, {-20, 10}};
+    Polygon2D polygon2D(points);
+    EXPECT_EQ(-20, polygon2D.getMinX());
+}
+
+TEST_F(Polygon2DTest, getMaxX) {
+    std::vector<sb_geom::Point2D> points = {{10, 20}, {34.22, 9}, {34, 9.33}, {-20, 10}};
+    Polygon2D polygon2D(points);
+    EXPECT_EQ(34.22, polygon2D.getMaxX());
+}
+
+TEST_F(Polygon2DTest, getMinY) {
+    std::vector<sb_geom::Point2D> points = {{10, 20}, {34.22, 9}, {34, 9.33}, {-20, 10}};
+    Polygon2D polygon2D(points);
+    EXPECT_EQ(9, polygon2D.getMinY());
+}
+
+TEST_F(Polygon2DTest, getMaxY) {
+    std::vector<sb_geom::Point2D> points = {{10, 20}, {34.22, 9}, {34, 9.33}, {-20, 10}};
+    Polygon2D polygon2D(points);
+    EXPECT_EQ(20, polygon2D.getMaxY());
+}
+
 int main(int argc, char** argv) {
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();

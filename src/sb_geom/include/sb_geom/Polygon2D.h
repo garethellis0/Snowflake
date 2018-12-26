@@ -48,6 +48,34 @@ class Polygon2D {
      */
     std::vector<Point2D> getBoundaryPoints() { return this->boundary_points; }
 
+    /**
+     * Get the minimum X value in this polygon
+     *
+     * @return the minimum X value in this polygon
+     */
+    double getMinX();
+
+    /**
+     * Get the maximum X value in this polygon
+     *
+     * @return the maximum X value in this polygon
+     */
+    double getMaxX();
+
+    /**
+     * Get the minimum Y value in this polygon
+     *
+     * @return the minimum Y value in this polygon
+     */
+    double getMinY();
+
+    /**
+     * Get the maximum Y value in this polygon
+     *
+     * @return the maximum Y value in this polygon
+     */
+    double getMaxY();
+
   private:
     // The points that make up the boundary of this area
     // The first and last points in the list are assumed to be connected
