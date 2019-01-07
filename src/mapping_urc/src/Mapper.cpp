@@ -27,6 +27,9 @@ void Mapper::createNextMap() {
     // Update the map with all the new risk areas we've seen since we last generated a map
     updateMapWithRiskAreas(new_map, risk_areas);
 
+    // Clear the risk areas
+    risk_areas.clear();
+
     // Save our new WorldMap
     prev_map = std::move(new_map);
 }
@@ -76,8 +79,8 @@ Mapper::GraphBounds Mapper::getNewGraphBounds() {
     // Figure out the min/max x and y from:
     //  - the last WorldMap we generated
     //  - all new risk areas
-    std::vector<double> x_values = {prev_map.getGraphMinX(), prev_map.getGraphMaxX()};
-    std::vector<double> y_values = {prev_map.getGraphMinY(), prev_map.getGraphMaxY()};
+    std::vector<double> x_values = {prev_map.getMinX(), prev_map.getMaxX()};
+    std::vector<double> y_values = {prev_map.getMinY(), prev_map.getMaxY()};
     for(const auto& area_with_score : risk_areas) {
         sb_geom::Polygon2D area = area_with_score.area;
         x_values.emplace_back(area.getMinX());

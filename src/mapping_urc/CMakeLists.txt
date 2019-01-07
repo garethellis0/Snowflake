@@ -11,7 +11,7 @@ endif()
 # can have easy autocompletion
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-add_definitions(--std=c++14)
+add_definitions(--std=c++17)
 
 ## Find catkin macros and libraries
 find_package(catkin REQUIRED COMPONENTS
@@ -59,7 +59,8 @@ target_link_libraries(mapper_node ${catkin_LIBRARIES})
 
 ## Add gtest based cpp test target and link libraries
 if (CATKIN_ENABLE_TESTING)
-    #TODO: gTest (Issue #348)
+    catkin_add_gtest(WorldMap-test test/WorldMap-test.cpp src/WorldMap.cpp)
+    target_link_libraries(WorldMap-test ${catkin_LIBRARIES})
 
     #TODO: rosTest (Issue #348)
 

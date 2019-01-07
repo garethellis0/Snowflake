@@ -1,5 +1,7 @@
 // TODO: start of file comment
 
+#include <WorldMap.h>
+
 #include "WorldMap.h"
 
 using namespace multi_resolution_graph;
@@ -8,8 +10,8 @@ WorldMap::WorldMap(
         double size, double x_offset, double y_offset) :
         x_offset(x_offset),
         y_offset(y_offset) {
+
     // Setup the underlying graph
-    GraphFactory<CostCell> graph_factory;
     graph_factory.setGraphScale(size);
     graph = graph_factory.createGraph();
 }
@@ -26,3 +28,4 @@ void WorldMap::copyCostCellsFromMap(WorldMap &source_map) {
         node->containedValue() = source_map.getCostAtPoint(coord.x, coord.y);
     }
 }
+
