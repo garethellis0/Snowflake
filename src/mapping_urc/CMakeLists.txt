@@ -36,16 +36,19 @@ catkin_package()
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-    ${catkin_INCLUDE_DIRS}
-    ./include
+        ${catkin_INCLUDE_DIRS}
+        ${multi_resolution_graph_INCLUDE_DIRECTORIES}
+        ./include
 )
 
 ## Declare a C++ executable
 add_executable(mapper_node 
-    src/mapper_node.cpp
-    src/MapperNode.cpp
-        src/Mapper.cpp include/Mapper.h src/WorldMap.cpp)
-target_link_libraries(mapper_node ${catkin_LIBRARIES})
+        src/Mapper.cpp
+        src/MapperNode.cpp
+        src/WorldMap.cpp
+        src/mapper_node.cpp
+        )
+target_link_libraries(mapper_node ${catkin_LIBRARIES} multi_resolution_graph)
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(${PROJECT_NAME}_node
